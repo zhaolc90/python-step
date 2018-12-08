@@ -1,11 +1,12 @@
 from django.conf.urls import include, url
-# from django.urls import include, path
-from django.contrib import admin
+
+from .views import page
 
 urlpatterns = [
     # Examples:
     # url(r'^$', 'mysite.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
-    url(r'^site/', include('sitebuilder.urls')),
-    url(r'^admin/', include(admin.site.urls)),
+
+    url(r'^(?P<slug>[\w./-]+)/$', page, name='page'),
+    url(r'^$', page, name='homepage'),
 ]
