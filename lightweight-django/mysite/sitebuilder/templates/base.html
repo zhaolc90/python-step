@@ -7,9 +7,55 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>{% block title %}Rapid Propotypes{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css'%}">
+    <link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css'%}">
     <link rel="stylesheet" href="{% static 'css/site.css'%}">
 </head>
 <body>
+    {% block top-nav-wrapper%}
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">Project name</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li {% if slug == 'index' %}class="active"{% endif %}>
+                    <a href="/">Home</a>
+                </li>
+                <li {% if slug == 'contact' %}class="active"{% endif %}>
+                    <a href="{% url 'page' 'contact' %}">Contact</a>
+                </li>
+                <li {% if slug == 'hello' %}class="active"{% endif %}>
+                    <a href="{% url 'page' 'hello' %}">Hello</a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li {% if slug == 'login' %}class="active"{% endif %}>
+                    <a href="{% url 'page' 'login' %}">Login</a>
+                </li>
+            </ul>
+        </div>
+        {% comment %} <div id="navbar" class="navbar-collapse collapse">
+          <form class="navbar-form navbar-right">
+            <div class="form-group">
+              <input type="text" placeholder="Email" class="form-control">
+            </div>
+            <div class="form-group">
+              <input type="password" placeholder="Password" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-success">Sign in</button>
+          </form>
+        </div><!--/.navbar-collapse --> {% endcomment %}
+      </div>
+    </nav>
+    {% endblock %}
+    <div class="height50"></div>
     {% block content %}{% endblock %}
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>

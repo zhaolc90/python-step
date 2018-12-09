@@ -1,28 +1,47 @@
 # django==1.7.0
 import sys
 import os
+import hashlib
 from io import BytesIO
 from PIL import Image,ImageDraw
+from django.views.decorators.http import etag 
 
 from django.conf.urls import url
 from django.core.wsgi import get_wsgi_application
+from django.shortcuts import render
+from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseBadRequest
 from django import forms
 from django.conf import settings
 DEBUG = os.environ.get('DEBUG', 'on') ==  'on'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'c+baojq!^z-2vw#e^ep=&1!r#acaodq4rr3d0lb#&kw9vbyxhx')
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
+BASE_DIR = os.path.dirname(__file__)
 
 settings.configure(
     DEBUG=DEBUG,
     SECRET_KEY=SECRET_KEY,
     ALLOWED_HOSTS=ALLOWED_HOSTS,
     ROOT_URLCONF=__name__,
+    APP_DIRS= True,
     MIDDLEWARE_CLASSES=(
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
     ),
+    INSTALLED_APPS=(
+        'django.contrib.staticfiles',
+    ),
+    TEMPLATE_DIRS=(
+        os.path.join(BASE_DIR, 'templates/'),
+    ),
+    STATICFILES_DIRS=(
+        os.path.join(BASE_DIR, 'static'),
+    ),
+    DIRS=(
+        os.path.join(BASE_DIR, 'templates'),
+    ),
+    STATIC_URL='/static/',
 )
 class ImageForm(forms.Form):
     height= forms.IntegerField(min_value=1,max_value=2000)
@@ -42,7 +61,11 @@ class ImageForm(forms.Form):
         image.save(content, image_format)
         content.seek(0)
         return content
+def generate_etag(request, width, height):
+    content = 'Placeholder: {0} x {1}'.format(width, height)
+    return hashlib.sha1(content.encode('utf-8')).hexdigest()
 
+@etag(generate_etag)
 def placeholder(request, width, height):
     print(width)
     form = ImageForm({'height': height, 'width': width})
@@ -53,7 +76,11 @@ def placeholder(request, width, height):
         return HttpResponseBadRequest('Invalid Image Request')
 
 def index(request):
-    return HttpResponse('Hello World')
+    example = reverse('placeholder',kwargs={'width':50,'height':50})
+    context = {
+        'example':request.build_absolute_uri(example)
+    }
+    return render(request, 'home.html', context)
 
 urlpatterns = (
     url(r'^image/(?P<width>[0-9]+)x(?P<height>[0-9]+)/$', placeholder,

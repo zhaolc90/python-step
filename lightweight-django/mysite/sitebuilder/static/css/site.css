@@ -1,3 +1,7 @@
 body{
-    background-color: bisque;
+    /* background-color: bisque;     */
+}
+
+.height50{
+    height: 50px;
 }
